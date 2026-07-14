@@ -16,7 +16,7 @@ every automation I build.
 
 | Project | Problem Solved |
 |---|---|
-| [Form Submission Notifier](./webhook-form-notifier) | Instant notification when a form is submitted, eliminating manual inbox checking |
+| [Form Submission Notifier](./01-webhook-form-notifier/) | Instant notification when a form is submitted, eliminating manual inbox checking |
 
 *(more projects added as the portfolio grows)*
 
