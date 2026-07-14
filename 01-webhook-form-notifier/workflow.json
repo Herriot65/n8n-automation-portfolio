@@ -1,0 +1,87 @@
+{
+  "name": "webhook-form-notifier",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Contact Us",
+        "formDescription": "We'll get back to you soon !",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name"
+            },
+            {
+              "fieldLabel": "Message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "2c5e6884-f8a4-4c5b-afa5-ddc5a73639e4",
+      "name": "On form submission",
+      "webhookId": "3769b3cd-dc27-4594-baa5-5986f0cbd212"
+    },
+    {
+      "parameters": {
+        "sendTo": "paximi4106@buloan.com",
+        "subject": "New Contact Form Submission",
+        "message": "=FullName : {{ $json['Full Name'] }}\nMessage : {{ $json.Message }} \n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        0
+      ],
+      "id": "ec2787d7-3a58-4485-b7f0-dd2b3730e363",
+      "name": "Send a message",
+      "webhookId": "af38966f-1380-43cd-ab6d-ef7debe174c2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MVHaxURUfjSoFLNP",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "58d22f63-15fc-4518-b100-302627163a72",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "449333f5eb9ffee168c48f79ff5a1825d0ffc6a974e26f708eb787d94cdf4ff9"
+  },
+  "nodeGroups": [],
+  "id": "iBBJrKtNh9DWdBXg",
+  "tags": []
+}
