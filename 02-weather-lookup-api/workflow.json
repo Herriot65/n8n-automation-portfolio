@@ -1,0 +1,292 @@
+{
+  "name": "workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6094b9e4-b34a-4930-bf95-c408707878fe",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1024,
+        -16
+      ],
+      "id": "052f4f3f-df26-4986-aee5-f39ddc64c2b8",
+      "name": "Webhook",
+      "webhookId": "6094b9e4-b34a-4930-bf95-c408707878fe"
+    },
+    {
+      "parameters": {
+        "url": "https://geocoding-api.open-meteo.com/v1/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{$('Webhook').item.json.query.city}}"
+            },
+            {
+              "name": "count",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -736,
+        -16
+      ],
+      "id": "48f8541d-0730-43f8-8988-d651121bbaad",
+      "name": "Geocode City"
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "={{ $json.results[0].latitude }}"
+            },
+            {
+              "name": "longitude",
+              "value": "={{ $json.results[0].longitude }}"
+            },
+            {
+              "name": "current",
+              "value": "temperature_2m,weathercode"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -256,
+        -208
+      ],
+      "id": "3a18195d-ad3e-40a0-ba47-35be48fc9f07",
+      "name": "Weather API"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cee856e-ce68-43a4-b62f-2fccb9f9f738",
+              "name": "=city",
+              "value": "={{ $('Webhook').item.json.query.city }}",
+              "type": "string"
+            },
+            {
+              "id": "c3c708d4-468b-4bbb-91c7-a2267940caa3",
+              "name": "temperature_celsius",
+              "value": "={{ $json.current.temperature_2m }}",
+              "type": "number"
+            },
+            {
+              "id": "838f4b8e-dc2d-4b4d-b1fa-63d2284495ea",
+              "name": "retrieved_at",
+              "value": "={{ $json.current.time }}",
+              "type": "string"
+            },
+            {
+              "id": "3a85bc62-6a6e-49c2-bf25-f487a002b4fd",
+              "name": "condition",
+              "value": "={{ $json.current.weathercode }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -208
+      ],
+      "id": "9c0de9fa-9aaf-4b81-9e49-9fa9eeaf110b",
+      "name": "Reshape"
+    },
+    {
+      "parameters": {
+        "jsCode": "const weatherCodes = {\n  0: \"Clear sky\",\n  1: \"Mainly clear\",\n  2: \"Partly cloudy\",\n  3: \"Overcast\",\n  45: \"Fog\",\n  48: \"Depositing rime fog\",\n  51: \"Light drizzle\",\n  61: \"Slight rain\",\n  63: \"Moderate rain\",\n  65: \"Heavy rain\",\n  71: \"Slight snow\",\n  80: \"Rain showers\",\n  95: \"Thunderstorm\"\n};\n\nfor (const item of $input.all()) {\n  const code = item.json.condition;\n  item.json.condition = weatherCodes[code] || `Unknown (code ${code})`;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        32
+      ],
+      "id": "9028947f-bd73-4ac1-a300-a1516f0451d8",
+      "name": "Map codes"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        544,
+        32
+      ],
+      "id": "3b804eab-23b8-4c18-b62a-2387962e2dd7",
+      "name": "Respond"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5b529ff5-032a-45ea-aad5-35bce54df7f9",
+              "leftValue": "={{ $json.results && $json.results.length > 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -496,
+        -16
+      ],
+      "id": "f3b7cfcf-914b-45bb-929b-f12a3b623cbd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"error\": \"City not found\",\n  \"message\": \"We couldn't find '{{ $('Webhook').item.json.query.city }}'. Please check the spelling and try again.\"\n}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -144,
+        208
+      ],
+      "id": "7982eea2-1ef5-408a-abe2-f4bcf9d1b2bc",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Geocode City",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geocode City": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weather API": {
+      "main": [
+        [
+          {
+            "node": "Reshape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reshape": {
+      "main": [
+        [
+          {
+            "node": "Map codes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map codes": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Weather API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6e5407fc-7f7f-4b11-bd7b-b4100dfe0f83",
+  "meta": {
+    "instanceId": "449333f5eb9ffee168c48f79ff5a1825d0ffc6a974e26f708eb787d94cdf4ff9"
+  },
+  "nodeGroups": [],
+  "id": "RVu3tyJO9smkAmtv",
+  "tags": []
+}

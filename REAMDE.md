@@ -17,6 +17,8 @@ every automation I build.
 | Project | Problem Solved |
 |---|---|
 | [Form Submission Notifier](./01-webhook-form-notifier/) | Instant notification when a form is submitted, eliminating manual inbox checking |
+| [Weather Lookup API](./02-weather-lookup-api/) | On-demand weather data for any city without maintaining a backend proxy service |
+| [Currency Converter API](./03-currency-converter-api/) | Real-time currency conversion with built-in validation, removing the need for in-house exchange-rate integration |
 
 *(more projects added as the portfolio grows)*
 

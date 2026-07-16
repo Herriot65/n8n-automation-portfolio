@@ -1,0 +1,546 @@
+{
+  "name": "Currency Converter API",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c91bbc19-e0d1-4636-a82e-3b8937b911bc",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1056,
+        -32
+      ],
+      "id": "74a163e6-1ed6-4fb9-b24d-d46c0093a5c0",
+      "name": "Webhook",
+      "webhookId": "c91bbc19-e0d1-4636-a82e-3b8937b911bc"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"Bad request! All the parameters are required\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -544,
+        -320
+      ],
+      "id": "84c7f2eb-de88-4ea1-931b-2d5371281e0b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aacce6d8-892f-415e-a1a4-a9736286f861",
+              "leftValue": "={{ Object.keys($json.body ?? {}).length == 3 }}",
+              "rightValue": "=3",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -816,
+        -176
+      ],
+      "id": "6d748629-4c27-483c-9214-2505c605f561",
+      "name": "Empty Body"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"Please check the spelling or the amount should be a number\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -96,
+        368
+      ],
+      "id": "e88011c4-157c-489f-bbac-3754c60247f5",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "96e3b183-7f8e-4a06-b22b-024ecfe3d874",
+              "leftValue": "={{ $json.body.amount }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "674b85c0-b897-48c5-9843-6e5b097bada7",
+              "leftValue": "={{ typeof $json.body.amount !== 'string' }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -608,
+        80
+      ],
+      "id": "7cc8cfc1-3c71-4003-bd60-f5346a5dcab8",
+      "name": "Amount validation"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"Check the from attribute spelling or verify it's not an empty string\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        48,
+        -80
+      ],
+      "id": "61320c34-22ab-455e-ab4e-d246acab9cd9",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dcf925cd-e96e-4d79-97a9-8baf8fa4dc1f",
+              "leftValue": "={{ $json.error.status }}",
+              "rightValue": 404,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        -32
+      ],
+      "id": "1e9ac3bb-ddf8-4e42-9003-969326a2ebff",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"Verify from or to has a valid currency code\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        752,
+        160
+      ],
+      "id": "b4ccd435-267b-4194-8457-1584cfd3f5c1",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "841f571e-e285-49aa-b5bd-4f949c6cb791",
+              "leftValue": "={{ $json.body.from }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b3d34001-1e3a-4f2f-80ba-eba652ece2da",
+              "leftValue": "={{ $json.body.from}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        -288
+      ],
+      "id": "24d52617-4c02-4dd1-8fbe-a9ab3f49450f",
+      "name": "Currency attributes validation"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1008,
+        -272
+      ],
+      "id": "af04f40a-10a3-479a-ac37-0f11240db821",
+      "name": "Respond to Webhook4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { amount,from,to } = $('Webhook').first().json.body;\nconst rate = $input.all()[0].json.conversion_rates[to];\nconst converted_amount = amount*rate;\nreturn { amount, from, to, converted_amount, rate }\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -368
+      ],
+      "id": "ad92b201-df41-46e8-a571-a10ddd78a9d1",
+      "name": "Calculation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6d338f46-e95e-4e6c-bc14-0e124ca205ba",
+              "leftValue": "={{ $json.body.amount }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -416,
+        -64
+      ],
+      "id": "dd7d70f7-7b0d-4e67-8743-5b8d2b8283df",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"amount should be a positive number\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -112,
+        112
+      ],
+      "id": "25c54d6c-19b5-44a0-8db0-29687b9e9278",
+      "name": "Respond to Webhook5"
+    },
+    {
+      "parameters": {
+        "url": "=https://v6.exchangerate-api.com/v6/{{$env.EXCHANGE_API_KEY}}/latest/{{ $('Webhook').item.json.body.from }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        144,
+        -304
+      ],
+      "id": "4683dd36-7410-4705-b7ac-8af67972a066",
+      "name": "Exchange rate API Call",
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "acb9a43d-8dfb-44be-8d0f-8a065d483957",
+              "leftValue": "={{ $('Webhook').item.json.body.to in $json.conversion_rates }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        -240
+      ],
+      "id": "1474f870-4180-481e-9b8a-2e11d3393628",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"Check to attribute have a valid currency code\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        912,
+        16
+      ],
+      "id": "de597729-c214-405a-85ac-ac1d0fb101b8",
+      "name": "Respond to Webhook6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Empty Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Empty Body": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Amount validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amount validation": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Currency attributes validation": {
+      "main": [
+        [
+          {
+            "node": "Exchange rate API Call",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculation": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Currency attributes validation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exchange rate API Call": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Calculation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ff66cf8c-6dae-4e2e-ae72-8d98cdbca1fd",
+  "meta": {
+    "instanceId": "449333f5eb9ffee168c48f79ff5a1825d0ffc6a974e26f708eb787d94cdf4ff9"
+  },
+  "nodeGroups": [],
+  "id": "yZMdRTPA6hbc7fgF",
+  "tags": []
+}
